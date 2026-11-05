@@ -1,0 +1,75 @@
+<div class="container py-4">
+  <h1 class="mb-4">Star Wars - Personajes</h1>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  }
+
+  <div class="row g-4">
+    @for (person of people(); track person.url) {
+      <div class="col-6 col-md-4 col-lg-3">
+        <!-- [people] = INPUT (padre -> hijo) | (peopleSelected) = OUTPUT (hijo -> padre) -->
+        <app-people-item
+          [people]="person"
+          (peopleSelected)="onPeopleSelected($event)"
+        />
+      </div>
+    }
+  </div>
+
+  @if (!loading() && !error()) {
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      @if (hasPrevious()) {
+        <button type="button" class="btn btn-outline-primary"
+                (click)="loadPage(page() - 1)">Anterior</button>
+      } @else {
+        <span></span>
+      }
+      <span>Página {{ page() }}</span>
+      @if (hasNext()) {
+        <button type="button" class="btn btn-outline-primary"
+                (click)="loadPage(page() + 1)">Siguiente</button>
+      } @else {
+        <span></span>
+      }
+    </div>
+  }
+</div>
+
+<!-- Modal con la información del personaje seleccionado -->
+<ng-template #modalContent let-modal>
+  @if (selectedPeople(); as p) {
+    <div class="modal-header">
+      <h4 class="modal-title">{{ p.name }}</h4>
+      <button type="button" class="btn-close" aria-label="Cerrar"
+              (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>Altura:</strong> {{ p.height }} cm</li>
+        <li class="list-group-item"><strong>Peso:</strong>
+          @if (p.mass === 'unknown') { Desconocido } @else { {{ p.mass }} kg }
+        </li>
+        <li class="list-group-item"><strong>Color de pelo:</strong> {{ p.hair_color }}</li>
+        <li class="list-group-item"><strong>Color de piel:</strong> {{ p.skin_color }}</li>
+        <li class="list-group-item"><strong>Color de ojos:</strong> {{ p.eye_color }}</li>
+        <li class="list-group-item"><strong>Año de nacimiento:</strong> {{ p.birth_year }}</li>
+        <li class="list-group-item"><strong>Género:</strong> {{ p.gender }}</li>
+        <li class="list-group-item"><strong>Películas:</strong> {{ p.films.length }}</li>
+        <li class="list-group-item"><strong>Vehículos:</strong> {{ p.vehicles.length }}</li>
+        <li class="list-group-item"><strong>Naves:</strong> {{ p.starships.length }}</li>
+      </ul>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.close()">Cerrar</button>
+    </div>
+  }
+</ng-template>
